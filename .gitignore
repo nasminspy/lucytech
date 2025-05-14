@@ -1,0 +1,35 @@
+# Binaries
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+main
+
+# Build output
+/bin/
+/build/
+/dist/
+
+# Vendor dependencies (if using `go mod vendor`)
+/vendor/
+
+# Logs
+*.log
+
+# IDE/editor files
+.vscode/
+.idea/
+*.swp
+*~
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Coverage & test files
+*.out
+coverage.*
+
+# Dependency files (if using Go tools that produce them)
+go.sum

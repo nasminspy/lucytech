@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Web Page Analyzer</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 2rem;
+            background-color: #f9f9f9;
+        }
+        form {
+            margin-bottom: 2rem;
+        }
+        input[type="text"] {
+            width: 60%;
+            padding: 0.5rem;
+            font-size: 1rem;
+        }
+        input[type="submit"] {
+            padding: 0.5rem 1rem;
+            font-size: 1rem;
+        }
+        .result, .error {
+            background-color: white;
+            padding: 1rem;
+            border-radius: 5px;
+            box-shadow: 0 0 5px rgba(0,0,0,0.1);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 0.5rem;
+            text-align: left;
+        }
+        th {
+            background-color: #f0f0f0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Web Page Analyzer</h1>
+    <form action="/analyze" method="post">
+        <input type="text" name="url" placeholder="Enter a webpage URL (e.g. https://example.com)" required>
+        <input type="submit" value="Analyze">
+    </form>
+
+    {{if .Error}}
+    <div class="error">
+        <strong>Error:</strong> {{.Error}}
+    </div>
+    {{end}}
+
+    {{if .Result}}
+    <div class="result">
+        <h2>Analysis Result</h2>
+        <p><strong>HTML Version:</strong> {{.Result.HTMLVersion}}</p>
+        <p><strong>Title:</strong> {{.Result.Title}}</p>
+
+        <h3>Headings Count</h3>
+        <table>
+            <tr><th>Heading</th><th>Count</th></tr>
+            {{range $key, $value := .Result.Headings}}
+            <tr><td>{{$key}}</td><td>{{$value}}</td></tr>
+            {{end}}
+        </table>
+
+        <h3>Links</h3>
+        <p><strong>Internal Links:</strong> {{.Result.InternalLinks}}</p>
+        <p><strong>External Links:</strong> {{.Result.ExternalLinks}}</p>
+        <p><strong>Inaccessible Links:</strong> {{.Result.InaccessibleLinks}}</p>
+
+        <p><strong>Login Form Present:</strong> {{.Result.LoginForm}}</p>
+    </div>
+    {{end}}
+</body>
+</html>
