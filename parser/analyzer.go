@@ -149,12 +149,15 @@ func detectHTMLVersion(doc *html.Node) string {
 	return "Unknown"
 }
 
+const maxConcurrentRequests = 10 // Tune this value based on system capacity
+
 // countLinks counts internal vs external links and checks which links are inaccessible.
 // It performs concurrent HTTP HEAD requests to verify link accessibility.
 func countLinks(result *AnalysisResult, base *url.URL, links []string) {
-	seen := make(map[string]bool)           // Track processed links to avoid duplicates
-	var wg sync.WaitGroup                   // WaitGroup to wait for all link checks
-	resultCh := make(chan bool, len(links)) // Buffered channel to collect accessibility results
+	seen := make(map[string]bool)                     // Track processed links to avoid duplicates
+	var wg sync.WaitGroup                             // WaitGroup to wait for all link checks
+	resultCh := make(chan bool, len(links))           // Buffered channel to collect accessibility results
+	sem := make(chan struct{}, maxConcurrentRequests) // Semaphore to limit concurrency
 
 	for _, link := range links {
 		if link == "" || seen[link] {
@@ -183,6 +186,9 @@ func countLinks(result *AnalysisResult, base *url.URL, links []string) {
 		wg.Add(1)
 		go func(link string) {
 			defer wg.Done()
+
+			sem <- struct{}{}        // Acquire a semaphore slot
+			defer func() { <-sem }() // Release the semaphore slot
 
 			// Create a HEAD request to avoid downloading the whole content
 			req, err := http.NewRequest(http.MethodHead, link, nil)
